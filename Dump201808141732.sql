@@ -39,7 +39,7 @@ CREATE TABLE `dbur_agentes` (
 
 LOCK TABLES `dbur_agentes` WRITE;
 /*!40000 ALTER TABLE `dbur_agentes` DISABLE KEYS */;
-INSERT INTO `dbur_agentes` VALUES ('ursv0001','Equipo 1','Equipo numero 1','a9cbbbb4-798d-493d-98b6-b8587ec49d6a');
+INSERT INTO `dbur_agentes` VALUES ('ursv0001','Equipo 1','Desarrollo en Oficina','a9cbbbb4-798d-493d-98b6-b8587ec49d6a');
 /*!40000 ALTER TABLE `dbur_agentes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -138,7 +138,7 @@ CREATE TABLE `dbur_det_categorias_personas` (
   KEY `fk_dbur_det_categorias_personas_2_idx` (`id_persona`),
   CONSTRAINT `fk_dbur_det_categorias_personas_1` FOREIGN KEY (`id_categoria`) REFERENCES `dbur_categorias_personas` (`id_categoria`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_dbur_det_categorias_personas_2` FOREIGN KEY (`id_persona`) REFERENCES `dbur_personas` (`id_persona`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -394,4 +394,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-08-14 17:32:56
+-- Dump completed on 2018-08-15 17:41:58
