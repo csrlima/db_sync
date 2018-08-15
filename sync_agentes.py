@@ -98,6 +98,32 @@ class Sync_agentes():
             self.logger.error("No se pudo eliminar _delete: {0}".format(id))
             return False
 
+    def _update(self, item):
+        try:
+            engine = create_engine(self._db_connection)
+            metadata = MetaData()
+            connection = engine.connect()
+        except Exception as e:
+            self.logger.error("No se pudo conectar a la base de datos _insert: {0}".format(e))
+            return False
+        try:
+            dbur_agentes = Table('dbur_agentes', metadata, autoload=True, autoload_with=engine)
+            statement = update(dbur_agentes).values(
+                    nombre_agente=item['nombre_agente'],
+                    desc_agente=item['desc_agente'],
+                    id_restaurante='a9cbbbb4-798d-493d-98b6-b8587ec49d6a'
+                ).where(dbur_agentes.columns.id_agente==item['id_agente'])
+        except Exception as e:
+            self.logger.error("No se pudo preparar el statement query _insert: {0}".format(e))
+            return False
+        result = connection.execute(statement)
+        if result:
+            self.logger.info("Elemento actualizado: {0}".format(item['id_agente']))
+            return True
+        else:
+            self.logger.error("No se pudo actualizar: {0}".format(item['id_agente']))
+            return False
+
     def _get_local_agente(self):
         try:
             engine = create_engine(self._db_connection)
@@ -110,31 +136,6 @@ class Sync_agentes():
         stmt = select([dbur_agentes])
         result = connection.execute(stmt).fetchall()
         return result
-
-    def _row_compare(self, dict_local, dict_serv, id):
-        try:
-            dict_local = dict(dict_local)
-            dict_local_keys = set(dict_local.keys())
-            dict_serv_keys = set(dict_serv.keys())
-            intersect_keys = dict_local_keys.intersection(dict_serv_keys)
-            modified = {o : (dict_serv[o], dict_local[o]) for o in intersect_keys if dict_local[o] != dict_serv[o]}
-            if len(modified) > 0:
-                return dict_local[id]
-            else:
-                return "iguales"
-        except Exception as e:
-            self.logger.error("No se pudo comparar la fila _row_compare: id {0} except: {1}".format(id, e))
-            return False
-
-    def _search_elements(self, dict_local, dict_serv):
-        try:
-            list_remove = list(set(dict_local) - set(dict_serv))
-            list_add = list(set(dict_serv) - set(dict_local))
-            self.logger.info("Elementos nuevos: {0}, elementos a eliminar {1}".format(len(list_add), len(list_remove)))
-            return list_add, list_remove
-        except Exception as e:
-            self.logger.error("No se pudo buscar entre los elementos _search_elements: {0}".format(e))
-            return False
 
     def _resolve_add_remove(self):
         service_item = self._get_serv_agente()
@@ -156,5 +157,7 @@ class Sync_agentes():
         service_item = self._get_serv_agente()
         local_items = self._get_local_agente()
         for item in local_items:
-            modified = self._row_compare(item, service_item, 'id_agente')
-            print("modified: {0}").format(modified)
+            id_update = self._row_compare(item, service_item, 'id_agente')
+            if id_update == service_item['id_agente']:
+                # print(id_update)
+                self._update(service_item)
