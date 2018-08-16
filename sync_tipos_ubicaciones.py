@@ -5,7 +5,6 @@ from utils import Utils
 
 class Sync():
     def __init__(self, logger):
-        self._id_agente = 'ursv0001'
         self.logger = logger
         self.utils = Utils(logger)
         self._engine, self._metadata, self._connection = self.utils._db_init()
@@ -16,8 +15,8 @@ class Sync():
 
     def _get_service_data(self):
         try:
-            data = requests.post(self._api_url + 'urecognition_services/get_agente',
-                {'id_agente': self._id_agente}, auth=('mbeat', '14az20ymbeatserv'))
+            data = requests.post(self._api_url + 'urecognition_services/get_tipos_ubicaciones',
+                {}, auth=('mbeat', '14az20ymbeatserv'))
         except Exception as e:
             self.logger.error("Error al obtener el service _get_service_data: {0}".format(e))
             return False
@@ -34,7 +33,7 @@ class Sync():
 
     def _get_local_data(self):
         try:
-            tabla = Table('dbur_agentes', self._metadata, autoload=True, autoload_with=self._engine)
+            tabla = Table('dbur_tipos_ubicaciones', self._metadata, autoload=True, autoload_with=self._engine)
             statement = select([tabla])
             result = self._connection.execute(statement).fetchall()
             return result
@@ -44,8 +43,8 @@ class Sync():
 
     def _insert(self, item):
         try:
-            id = item['id_agente']
-            tabla = Table('dbur_agentes', self._metadata, autoload=True, autoload_with=self._engine)
+            id = item['id_tipo_ubicacion']
+            tabla = Table('dbur_tipos_ubicaciones', self._metadata, autoload=True, autoload_with=self._engine)
             statement = tabla.insert().values(
                     id_agente = id,
                     nombre_agente = item['nombre_agente'],
@@ -65,7 +64,7 @@ class Sync():
 
     def _delete(self, id):
         try:
-            tabla = Table('dbur_agentes', self._metadata, autoload=True, autoload_with=self._engine)
+            tabla = Table('dbur_tipos_ubicaciones', self._metadata, autoload=True, autoload_with=self._engine)
             statement = tabla.delete().where(tabla.columns.id_agente == id)
         except Exception as e:
             self.logger.error("No se pudo preparar el statement query _delete: {0}".format(e))

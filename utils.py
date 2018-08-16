@@ -1,12 +1,15 @@
-import logging
 import json
-import os
 from sqlalchemy import create_engine, MetaData
 # from settings import UR_DB_HOST, UR_DB_NAME, UR_DB_USER, UR_DB_PASSWORD, UR_FACES_DIR, UR_UNKNOWN_DIR, UR_SHOTS_DIR, UR_TOLERANCE
 
 class Utils():
+    def __init__(self, logger):
+        self.logger = logger
 
     _db_connection = 'mysql+pymysql://{0}:{1}@{2}/{3}?charset=utf8mb4'.format('root','14az20yzotac','127.0.0.1','db_piramide')
+
+    def _get_api_url(self):
+        return "http://xmpp.radiomarketbeat.com/api/"
 
     def _db_init(self):
         try:
@@ -18,26 +21,17 @@ class Utils():
             self.logger.error("No se pudo conectar a la base de datos _db_init: {0}".format(e))
             quit()
 
-    def _logger_init(self):
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
-        handler = logging.FileHandler(os.getenv("HOME") + '/sync_log_urecognition_service.txt')
-        handler.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-        return self.logger
-
     def _row_compare(self, dict_local, dict_serv, id):
         try:
             dict_local = dict(dict_local)
             dict_local_keys = set(dict_local.keys())
             dict_serv_keys = set(dict_serv.keys())
             intersect_keys = dict_local_keys.intersection(dict_serv_keys)
-            modified = {o : (dict_serv[o], dict_local[o]) for o in intersect_keys if dict_local[o] != dict_serv[o]}
+            modified = {o : (dict_serv[o], dict_local[o]) for o in intersect_keys if str(dict_local[o]) != str(dict_serv[o])}
             if len(modified) > 0:
                 return dict_local[id]
             else:
+                self.logger.info("Elementos iguales _row_compare: id {0}".format(dict_local[id]))
                 return "iguales"
         except Exception as e:
             self.logger.error("No se pudo comparar la fila _row_compare: id {0} except: {1}".format(id, e))
