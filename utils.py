@@ -1,12 +1,24 @@
 import logging
 import json
 import os
-import requests
-from sqlalchemy import create_engine, MetaData, Table, select, update
+from sqlalchemy import create_engine, MetaData
 # from settings import UR_DB_HOST, UR_DB_NAME, UR_DB_USER, UR_DB_PASSWORD, UR_FACES_DIR, UR_UNKNOWN_DIR, UR_SHOTS_DIR, UR_TOLERANCE
 
 class Utils():
-    def __init__(self, *args, **kwargs):
+
+    _db_connection = 'mysql+pymysql://{0}:{1}@{2}/{3}?charset=utf8mb4'.format('root','14az20yzotac','127.0.0.1','db_piramide')
+
+    def _db_init(self):
+        try:
+            engine = create_engine(self._db_connection)
+            metadata = MetaData()
+            connection = engine.connect()
+            return engine, metadata, connection
+        except Exception as e:
+            self.logger.error("No se pudo conectar a la base de datos _db_init: {0}".format(e))
+            quit()
+
+    def _logger_init(self):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
         handler = logging.FileHandler(os.getenv("HOME") + '/sync_log_urecognition_service.txt')
@@ -14,6 +26,7 @@ class Utils():
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
+        return self.logger
 
     def _row_compare(self, dict_local, dict_serv, id):
         try:

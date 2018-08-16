@@ -1,9 +1,9 @@
-from sync_agentes import Sync_agentes
+from sync_agentes import Sync
 
 
 
 
 
-sa = Sync_agentes()
-# sa._resolve_add_remove()
-sa._resolve_updates()
+sync_agentes = Sync()
+sync_agentes._resolve_updates()
+sync_agentes._resolve_add_remove()
