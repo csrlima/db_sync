@@ -46,3 +46,33 @@ class Utils():
         except Exception as e:
             self.logger.error("No se pudo buscar entre los elementos _search_elements: {0}".format(e))
             return False
+
+
+    def _ident_add_remove(self, local_items, service_items, id):
+        insert_items = []
+        delete_items = []
+        service_items_id = []
+        local_items_id = []
+
+        for item in service_items:
+            service_items_id.append(str(item[id]))
+        for item in local_items:
+            local_items_id.append(str(item[id]))
+
+        list_add, list_remove = self._search_elements(local_items_id, service_items_id)
+        for item_list_add in list_add:
+            for item_service in service_items:
+                if item_list_add == item_service[id]:
+                    insert_items.append(item_service)
+        for item_list_remove in list_remove:
+            delete_items.append(item_list_remove)
+        return insert_items, delete_items
+
+    def _ident_updates(self, local_items, service_items, id):
+        update_items = []
+        for local_item in local_items:
+            for service_item in service_items:
+                id_update = self._row_compare(local_item, service_item, id)
+                if str(id_update) == str(service_item[id]):
+                    update_items.append(service_item)
+        return update_items

@@ -4,6 +4,7 @@ from utils import Utils
 from sync_agentes import Sync as Sync_agentes
 from sync_clientes_marcas import Sync as Sync_clientes_marcas
 from sync_restaurantes_sucursales import Sync as Sync_restaurantes_sucursales
+from sync_tipos_ubicaciones import Sync as Sync_tipos_ubicaciones
 
 
 def _logger_init():
@@ -32,6 +33,11 @@ agente = dict(sync_agentes._get_local_data()[0])
 # sync_clientes_marcas._resolve_add_remove()
 
 # sync de restaurantes sucursales
-sync_restaurantes_sucursales = Sync_restaurantes_sucursales(logger, agente['id_agente'])
-sync_restaurantes_sucursales._resolve_updates()
-sync_restaurantes_sucursales._resolve_add_remove()
+# sync_restaurantes_sucursales = Sync_restaurantes_sucursales(logger, agente['id_agente'])
+# sync_restaurantes_sucursales._resolve_updates()
+# sync_restaurantes_sucursales._resolve_add_remove()
+
+# sync de tipos de ubicaciones
+sync_tipos_ubicaciones = Sync_tipos_ubicaciones(logger)
+sync_tipos_ubicaciones._resolve_updates()
+sync_tipos_ubicaciones._resolve_add_remove()

@@ -102,12 +102,6 @@ class Sync():
             self.logger.error("No se pudo actualizar: {0}".format(id))
             return False
 
-    def _get_local_data(self):
-        tabla = Table('dbur_agentes', self._metadata, autoload=True, autoload_with=self._engine)
-        stmt = select([tabla])
-        result = self._connection.execute(stmt).fetchall()
-        return result
-
     def _resolve_add_remove(self):
         # id comun de las tablas para buscar agregados y eliminados
         id = 'id_cliente'
