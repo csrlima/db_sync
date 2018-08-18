@@ -10,6 +10,7 @@ from sync_categorias_personas import Sync as Sync_categorias_personas
 from sync_personas import Sync as Sync_personas
 from sync_fotos import Sync as Sync_fotos
 from sync_info_personas import Sync as Sync_info_personas
+from sync_det_categorias_personas import Sync as Sync_det_categorias_personas
 
 
 def _logger_init():
@@ -84,3 +85,9 @@ logger.info('Actualizacion hacia abajo de dbur_det_info_personas')
 sync_info_personas = Sync_info_personas(logger, cliente['id_cliente'])
 sync_info_personas._resolve_updates()
 sync_info_personas._resolve_add_remove()
+
+# sync de detalle de categorias de personas
+logger.info('Actualizacion hacia abajo de dbur_det_categorias_personas')
+sync_det_categorias_personas = Sync_det_categorias_personas(logger)
+sync_det_categorias_personas._resolve_updates()
+sync_det_categorias_personas._resolve_add_remove()
