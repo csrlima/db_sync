@@ -1,5 +1,6 @@
 import json
 import requests
+import inspect
 from sqlalchemy import Table, select, update
 from utils import Utils
 
@@ -20,28 +21,27 @@ class Sync():
             data = requests.post(self._api_url + 'urecognition_services/get_tipos_ubicaciones',
                 {}, auth=('mbeat', '14az20ymbeatserv'))
         except Exception as e:
-            self.logger.error("Error al obtener el service _get_service_data: {0}".format(e))
+            self.logger.error("{0}. Error al obtener el service: {1}".format(inspect.stack()[0][3], e))
             return False
         if data.status_code == requests.codes.ok:
             if 'success' in data.json()['status']:
                 item = data.json()['data']
                 return item
             else:
-                self.logger.error("Resultado inesperado de service _get_service_data: {0}".format(data.text))
+                self.logger.error("{0}. Resultado inesperado de service: {1}".format(inspect.stack()[0][3], data.text))
                 return False
         else:
-            self.logger.error("Codigo de error de service _get_service_data: {0}".format(data.status_code))
+            self.logger.error("{0}. Codigo de error de service: {1}".format(inspect.stack()[0][3], data.status_code))
             return False
 
     def _get_local_data(self):
         try:
-            print(self._table_name)
             tabla = Table(self._table_name, self._metadata, autoload=True, autoload_with=self._engine)
             statement = select([tabla])
             result = self._connection.execute(statement).fetchall()
             return result
         except Exception as e:
-            self.logger.error("No se pudo preparar el statement query _get_local_data: {0}".format(e))
+            self.logger.error("{0}. No se pudo preparar el statement query: {1}".format(inspect.stack()[0][3], e))
             return False
 
     def _insert(self, item):
@@ -53,14 +53,14 @@ class Sync():
                     nombre_tipo = item['nombre_tipo']
                 )
         except Exception as e:
-            self.logger.error("No se pudo preparar el statement query _insert: {0}".format(e))
+            self.logger.error("{0}. No se pudo preparar el statement query: {1}".format(inspect.stack()[0][3], e))
             return False
         result = self._connection.execute(statement)
         if result:
-            self.logger.info("Elemento insertado: {0}".format(id))
+            self.logger.info("{0}. Elemento insertado: {1}".format(inspect.stack()[0][3], id))
             return True
         else:
-            self.logger.error("No se pudo insertar: {0}".format(id))
+            self.logger.error("{0}. No se pudo insertar: {1}".format(inspect.stack()[0][3], id))
             return False
 
     def _delete(self, id):
@@ -68,14 +68,14 @@ class Sync():
             tabla = Table(self._table_name, self._metadata, autoload=True, autoload_with=self._engine)
             statement = tabla.delete().where(tabla.columns.id_tipo_ubicacion == id)
         except Exception as e:
-            self.logger.error("No se pudo preparar el statement query _delete: {0}".format(e))
+            self.logger.error("{0}. No se pudo preparar el statement: {1}".format(inspect.stack()[0][3], e))
             return False
         result = self._connection.execute(statement)
         if result:
-            self.logger.info("Elemento eliminado id: {0}".format(id))
+            self.logger.info("{0}. Elemento eliminado id: {1}".format(inspect.stack()[0][3], id))
             return True
         else:
-            self.logger.error("No se pudo eliminar id: {0}".format(id))
+            self.logger.error("{0}. No se pudo eliminar id: {1}".format(inspect.stack()[0][3], id))
             return False
 
     def _update(self, item):
@@ -86,14 +86,14 @@ class Sync():
                     nombre_tipo = item['nombre_tipo']
                 ).where(tabla.columns.id_tipo_ubicacion == id)
         except Exception as e:
-            self.logger.error("No se pudo preparar el statement query _update: {0}".format(e))
+            self.logger.error("{0}. No se pudo preparar el statement: {1}".format(inspect.stack()[0][3], e))
             return False
         result = self._connection.execute(statement)
         if result:
-            self.logger.info("Elemento actualizado: {0}".format(id))
+            self.logger.info("{0}. Elemento actualizado: {1}".format(inspect.stack()[0][3], id))
             return True
         else:
-            self.logger.error("No se pudo actualizar: {0}".format(id))
+            self.logger.error("{0}. No se pudo actualizar: {1}".format(inspect.stack()[0][3], id))
             return False
 
     def _resolve_add_remove(self):

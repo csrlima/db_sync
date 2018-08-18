@@ -1,4 +1,5 @@
 import json
+import inspect
 from sqlalchemy import create_engine, MetaData
 # from settings import UR_DB_HOST, UR_DB_NAME, UR_DB_USER, UR_DB_PASSWORD, UR_FACES_DIR, UR_UNKNOWN_DIR, UR_SHOTS_DIR, UR_TOLERANCE
 
@@ -18,7 +19,7 @@ class Utils():
             connection = engine.connect()
             return engine, metadata, connection
         except Exception as e:
-            self.logger.error("No se pudo conectar a la base de datos _db_init: {0}".format(e))
+            self.logger.error("{0}. No se pudo conectar a la base de datos: {1}".format(inspect.stack()[0][3], e))
             quit()
 
     def _row_compare(self, dict_local, dict_serv, id):
@@ -31,20 +32,20 @@ class Utils():
             if len(modified) > 0:
                 return dict_local[id]
             else:
-                self.logger.info("Elementos iguales _row_compare: id {0}".format(dict_local[id]))
+                self.logger.info("{0}. Elementos iguales: id {1}".format(inspect.stack()[0][3], dict_local[id]))
                 return "iguales"
         except Exception as e:
-            self.logger.error("No se pudo comparar la fila _row_compare: id {0} except: {1}".format(id, e))
+            self.logger.error("{0}. No se pudo comparar la fila: id {1} except: {2}".format(inspect.stack()[0][3], id, e))
             return False
 
     def _search_elements(self, dict_local, dict_serv):
         try:
             list_remove = list(set(dict_local) - set(dict_serv))
             list_add = list(set(dict_serv) - set(dict_local))
-            self.logger.info("Elementos nuevos: {0}, elementos a eliminar {1}".format(len(list_add), len(list_remove)))
+            self.logger.info("{0}. Elementos nuevos: {1}, elementos a eliminar {2}".format(inspect.stack()[0][3], len(list_add), len(list_remove)))
             return list_add, list_remove
         except Exception as e:
-            self.logger.error("No se pudo buscar entre los elementos _search_elements: {0}".format(e))
+            self.logger.error("{0}. No se pudo buscar entre los elementos: {0}".format(inspect.stack()[0][3], e))
             return False
 
 

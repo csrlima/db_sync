@@ -5,21 +5,21 @@ from sqlalchemy import Table, select, update
 from utils import Utils
 
 class Sync():
-    def __init__(self, logger):
-        self._id_agente = 'ursv0001'
+    def __init__(self, logger, id_agente):
+        self._id_agente = id_agente
         self.logger = logger
         self.utils = Utils(logger)
         self._api_url = self.utils._get_api_url()
         self._engine, self._metadata, self._connection = self.utils._db_init()
-        self._service_items = [self._get_service_data()]
+        self._service_items = self._get_service_data()
         self._local_items = self._get_local_data()
 
-    _table_name = 'dbur_agentes'
-    _table_pk_name = 'id_agente'
+    _table_name = 'dbur_local_ubicaciones'
+    _table_pk_name = 'id_local_ubicacion'
 
     def _get_service_data(self):
         try:
-            data = requests.post(self._api_url + 'urecognition_services/get_agente',
+            data = requests.post(self._api_url + 'urecognition_services/get_local_ubicaciones',
                 {'id_agente': self._id_agente}, auth=('mbeat', '14az20ymbeatserv'))
         except Exception as e:
             self.logger.error("{0}. Error al obtener el service: {1}".format(inspect.stack()[0][3], e))
@@ -50,9 +50,9 @@ class Sync():
             id = item[self._table_pk_name]
             tabla = Table(self._table_name, self._metadata, autoload=True, autoload_with=self._engine)
             statement = tabla.insert().values(
-                    id_agente = id,
-                    nombre_agente = item['nombre_agente'],
-                    desc_agente = item['desc_agente'],
+                    id_local_ubicacion = id,
+                    nombre_local_ubicacion = item['nombre_local_ubicacion'],
+                    id_tipo_ubicacion = item['id_tipo_ubicacion'],
                     id_restaurante = item['id_restaurante']
                 )
         except Exception as e:
@@ -69,16 +69,16 @@ class Sync():
     def _delete(self, id):
         try:
             tabla = Table(self._table_name, self._metadata, autoload=True, autoload_with=self._engine)
-            statement = tabla.delete().where(tabla.columns.id_agente == id)
+            statement = tabla.delete().where(tabla.columns.id_local_ubicacion == id)
         except Exception as e:
-            self.logger.error("{0}. No se pudo preparar el statement query: {1}".format(inspect.stack()[0][3], e))
+            self.logger.error("{0}. No se pudo preparar el statement: {1}".format(inspect.stack()[0][3], e))
             return False
         result = self._connection.execute(statement)
         if result:
-            self.logger.info("{0}. Elemento eliminado: {1}".format(inspect.stack()[0][3], id))
+            self.logger.info("{0}. Elemento eliminado id: {1}".format(inspect.stack()[0][3], id))
             return True
         else:
-            self.logger.error("{0}. No se pudo eliminar: {1}".format(inspect.stack()[0][3], id))
+            self.logger.error("{0}. No se pudo eliminar id: {1}".format(inspect.stack()[0][3], id))
             return False
 
     def _update(self, item):
@@ -86,12 +86,12 @@ class Sync():
             id = item[self._table_pk_name]
             tabla = Table(self._table_name, self._metadata, autoload=True, autoload_with=self._engine)
             statement = update(tabla).values(
-                    nombre_agente = item['nombre_agente'],
-                    desc_agente = item['desc_agente'],
+                    nombre_local_ubicacion = item['nombre_local_ubicacion'],
+                    id_tipo_ubicacion = item['id_tipo_ubicacion'],
                     id_restaurante = item['id_restaurante']
-                ).where(tabla.columns.id_agente == id)
+                ).where(tabla.columns.id_local_ubicacion == id)
         except Exception as e:
-            self.logger.error("{0}. No se pudo preparar el statement query: {1}".format(inspect.stack()[0][3], e))
+            self.logger.error("{0}. No se pudo preparar el statement: {1}".format(inspect.stack()[0][3], e))
             return False
         result = self._connection.execute(statement)
         if result:
